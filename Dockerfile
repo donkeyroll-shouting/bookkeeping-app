@@ -55,8 +55,8 @@ USER nextjs
 
 EXPOSE 3000
 
-# PORT environment variable will be set by Render
-# Next.js standalone server automatically binds to 0.0.0.0:$PORT
+# Render sets PORT dynamically, Next.js standalone needs HOSTNAME set to 0.0.0.0
+ENV HOSTNAME="0.0.0.0"
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
