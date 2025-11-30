@@ -5,6 +5,8 @@ import { AddTransactionModal } from "@/components/dashboard/add-transaction-moda
 import { ExpensePieChart } from "@/components/dashboard/expense-pie-chart"
 import { AssetGrowthChart } from "@/components/dashboard/asset-growth-chart"
 
+import { ImportTransactionModal } from "@/components/dashboard/import-transaction-modal"
+
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
@@ -24,7 +26,10 @@ export default async function DashboardPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                <AddTransactionModal />
+                <div className="flex gap-2">
+                    <ImportTransactionModal />
+                    <AddTransactionModal />
+                </div>
             </div>
 
             <KPICards

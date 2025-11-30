@@ -24,3 +24,19 @@ export async function addTransaction(formData: FormData) {
 
     revalidatePath("/dashboard")
 }
+
+export async function importBatchTransactions(transactions: {
+    date: string
+    type: "Income" | "Expense"
+    amount: number
+    category: string
+    description: string
+}[]) {
+    await googleSheetsService.addBatchTransactions(transactions)
+    revalidatePath("/dashboard")
+}
+
+export async function deleteBatchTransactionsAction(ids: string[]) {
+    await googleSheetsService.deleteBatchTransactions(ids)
+    revalidatePath("/dashboard")
+}

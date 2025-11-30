@@ -47,8 +47,8 @@ export const googleSheetsService = {
   async addTransaction(data: Omit<Transaction, 'id'>) {
     const sheet = await loadDoc();
     const newRow = {
-        id: crypto.randomUUID(),
-        ...data
+      id: crypto.randomUUID(),
+      ...data
     };
     await sheet.addRow(newRow);
     return newRow;
@@ -79,5 +79,29 @@ export const googleSheetsService = {
       return true;
     }
     return false;
+  },
+
+  async addBatchTransactions(transactions: Omit<Transaction, 'id'>[]) {
+    const sheet = await loadDoc();
+    const newRows = transactions.map(t => ({
+      id: crypto.randomUUID(),
+      ...t
+    }));
+    await sheet.addRows(newRows);
+    return newRows;
+  },
+
+  async deleteBatchTransactions(ids: string[]) {
+    const sheet = await loadDoc();
+    const rows = await sheet.getRows();
+    const rowsToDelete = rows.filter((r) => ids.includes(r.get('id')));
+
+    // Delete in reverse order to avoid index shifting issues if that were relevant, 
+    // though google-spreadsheet handles row objects. 
+    // However, deleting sequentially is safer.
+    for (const row of rowsToDelete) {
+      await row.delete();
+    }
+    return true;
   }
 };

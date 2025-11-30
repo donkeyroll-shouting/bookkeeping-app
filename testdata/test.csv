@@ -1,0 +1,5 @@
+date,type,amount,category,description
+2023-10-01,Income,5000,Salary,October Salary
+2023-10-02,Expense,50,Groceries,Weekly shopping
+2023-10-03,Expense,120,Utilities,Electric bill
+2023-10-04,Expense,15,Transport,Uber ride
