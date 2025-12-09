@@ -1,11 +1,7 @@
 import { googleSheetsService } from "@/lib/googleSheets"
-import { KPICards } from "@/components/dashboard/kpi-cards"
-import { TransactionTable } from "@/components/dashboard/transaction-table"
-import { AddTransactionModal } from "@/components/dashboard/add-transaction-modal"
-import { ExpensePieChart } from "@/components/dashboard/expense-pie-chart"
-import { AssetGrowthChart } from "@/components/dashboard/asset-growth-chart"
-
 import { ImportTransactionModal } from "@/components/dashboard/import-transaction-modal"
+import { AddTransactionModal } from "@/components/dashboard/add-transaction-modal"
+import { DashboardContent } from "@/components/dashboard/dashboard-content"
 
 export const dynamic = 'force-dynamic'
 
@@ -32,24 +28,12 @@ export default async function DashboardPage() {
                 </div>
             </div>
 
-            <KPICards
+            <DashboardContent
+                transactions={transactions}
                 totalIncome={totalIncome}
                 totalExpenses={totalExpenses}
                 netBalance={netBalance}
             />
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <AssetGrowthChart transactions={transactions} />
-                <ExpensePieChart transactions={transactions} />
-                <div className="col-span-7">
-                    <div className="rounded-xl border bg-card text-card-foreground shadow">
-                        <div className="p-6 pt-0">
-                            <h3 className="text-lg font-semibold py-4">Recent Transactions</h3>
-                            <TransactionTable transactions={transactions} />
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     )
 }
