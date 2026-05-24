@@ -8,6 +8,14 @@ const authSecret =
     ? undefined
     : "local-bookkeeping-app-secure-jwt-secret-key-123")
 
+const configuredUsername =
+  process.env.USERNAME ||
+  (process.env.NODE_ENV === "production" ? undefined : "admin")
+
+const configuredPassword =
+  process.env.PASSWORD ||
+  (process.env.NODE_ENV === "production" ? undefined : "admin")
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -17,8 +25,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        // Hardcoded username and password directly in the application
-        if (credentials?.username === "admin" && credentials?.password === "admin") {
+        if (
+          configuredUsername &&
+          configuredPassword &&
+          credentials?.username === configuredUsername &&
+          credentials?.password === configuredPassword
+        ) {
           return { id: "1", name: "Administrator", email: "admin@local" }
         }
         return null

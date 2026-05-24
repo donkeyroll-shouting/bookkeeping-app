@@ -64,7 +64,7 @@ Open:
 http://localhost:3000
 ```
 
-Default demo credentials:
+Default local development credentials:
 
 ```text
 Username: admin
@@ -98,6 +98,15 @@ For Render Docker web services, set the service port to `10000` or let Render in
 ```bash
 PORT=10000
 ```
+
+Set the login credentials in Render:
+
+```bash
+USERNAME="your-username"
+PASSWORD="your-password"
+```
+
+Local development falls back to `admin/admin` if those variables are not set. Production requires both values.
 
 ## CSV Data
 
@@ -190,6 +199,8 @@ docker run -d \
   -p 3000:10000 \
   -e PORT=10000 \
   -e AUTH_SECRET="replace-with-a-long-random-secret" \
+  -e USERNAME="your-username" \
+  -e PASSWORD="your-password" \
   -v "$(pwd)/data:/app/data" \
   -v "$(pwd)/exports:/app/exports" \
   bookkeeping-app
@@ -197,7 +208,8 @@ docker run -d \
 
 ## Production Notes
 
-- Replace the hardcoded demo credentials before using this with real financial data.
+- Use private, non-default credentials before using this with real financial data.
 - Set `AUTH_SECRET` or `NEXTAUTH_SECRET` to a strong secret.
+- Set `USERNAME` and `PASSWORD` in production.
 - Mount persistent storage or replace the CSV store with an external database if data must survive deployments.
 - `npm install` currently reports security advisories for the installed dependency tree; review and upgrade dependencies before production use.

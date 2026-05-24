@@ -12,6 +12,9 @@ export default async function LoginPage({
 }) {
     const { error } = await searchParams
     const isError = error === "CredentialsSignin" || !!error
+    const showDemoCredentials = process.env.NODE_ENV !== "production"
+    const demoUsername = process.env.USERNAME || "admin"
+    const demoPassword = process.env.PASSWORD || "admin"
 
     return (
         <div className="flex h-screen w-full items-center justify-center bg-gray-50/50 px-4 dark:bg-zinc-950">
@@ -85,15 +88,17 @@ export default async function LoginPage({
                         </Button>
                     </form>
 
-                    <div className="rounded-lg border border-zinc-200/80 bg-zinc-50 p-3 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-350 mt-4">
-                        <p className="font-semibold text-xs uppercase tracking-wider text-zinc-500 mb-1">
-                            Demo Access Credentials
-                        </p>
-                        <div className="flex justify-between text-xs font-mono">
-                            <span>Username: <strong className="text-zinc-900 dark:text-zinc-100">admin</strong></span>
-                            <span>Password: <strong className="text-zinc-900 dark:text-zinc-100">admin</strong></span>
+                    {showDemoCredentials && (
+                        <div className="rounded-lg border border-zinc-200/80 bg-zinc-50 p-3 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-350 mt-4">
+                            <p className="font-semibold text-xs uppercase tracking-wider text-zinc-500 mb-1">
+                                Local Development Credentials
+                            </p>
+                            <div className="flex justify-between text-xs font-mono">
+                                <span>Username: <strong className="text-zinc-900 dark:text-zinc-100">{demoUsername}</strong></span>
+                                <span>Password: <strong className="text-zinc-900 dark:text-zinc-100">{demoPassword}</strong></span>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </CardContent>
             </Card>
         </div>
