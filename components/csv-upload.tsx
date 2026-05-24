@@ -29,6 +29,7 @@ interface TransactionDraft {
     amount: number
     category: string
     description: string
+    hasCustomId?: boolean
 }
 
 interface CsvUploadProps {
@@ -70,13 +71,15 @@ export function CsvUpload({ onSuccess }: CsvUploadProps) {
                         return
                     }
 
+                    const hasId = !!row.id
                     parsedData.push({
-                        id: crypto.randomUUID(),
+                        id: row.id || crypto.randomUUID(),
                         date: row.date,
                         type: row.type === "Income" ? "Income" : "Expense", // Default to Expense if not Income? Or strict?
                         amount: amount,
                         category: row.category || "Uncategorized",
                         description: row.description || "",
+                        hasCustomId: hasId,
                     })
                 })
 
@@ -106,8 +109,15 @@ export function CsvUpload({ onSuccess }: CsvUploadProps) {
     const handleImport = async () => {
         setIsUploading(true)
         try {
-            // Remove temporary ID before sending to server
-            const transactionsToImport = data.map(({ id, ...rest }) => rest)
+            // Keep custom ID if it was supplied in the imported CSV, otherwise omit it so server generates a permanent UUID
+            const transactionsToImport = data.map((t) => ({
+                id: t.hasCustomId ? t.id : undefined,
+                date: t.date,
+                type: t.type,
+                amount: t.amount,
+                category: t.category,
+                description: t.description,
+            }))
             await importBatchTransactions(transactionsToImport)
             onSuccess()
             setData([])

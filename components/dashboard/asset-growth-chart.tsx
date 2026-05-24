@@ -1,7 +1,7 @@
 "use client"
 
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts"
-import { Transaction } from "@/lib/googleSheets"
+import { Transaction } from "@/lib/csvStore"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useMemo } from "react"
 

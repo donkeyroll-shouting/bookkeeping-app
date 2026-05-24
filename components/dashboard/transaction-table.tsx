@@ -8,7 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Transaction } from "@/lib/googleSheets"
+import { Transaction } from "@/lib/csvStore"
 import { useState } from "react"
 import { ArrowUpDown, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"

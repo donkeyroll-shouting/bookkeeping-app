@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
-import { Transaction } from "@/lib/googleSheets"
+import { Transaction } from "@/lib/csvStore"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Dialog,

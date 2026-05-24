@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Transaction } from "@/lib/googleSheets"
+import { Transaction } from "@/lib/csvStore"
 import {
     Select,
     SelectContent,

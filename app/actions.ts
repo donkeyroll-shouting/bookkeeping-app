@@ -1,7 +1,10 @@
 "use server"
 
-import { googleSheetsService } from "@/lib/googleSheets"
+import { csvService } from "@/lib/csvStore"
 import { revalidatePath } from "next/cache"
+import fs from "fs"
+import path from "path"
+import Papa from "papaparse"
 
 export async function addTransaction(formData: FormData) {
     const date = formData.get("date") as string
@@ -14,7 +17,7 @@ export async function addTransaction(formData: FormData) {
         throw new Error("Invalid form data")
     }
 
-    await googleSheetsService.addTransaction({
+    await csvService.addTransaction({
         date,
         type,
         amount,
@@ -26,17 +29,67 @@ export async function addTransaction(formData: FormData) {
 }
 
 export async function importBatchTransactions(transactions: {
-    date: string
-    type: "Income" | "Expense"
-    amount: number
-    category: string
-    description: string
+    id?: string;
+    date: string;
+    type: "Income" | "Expense";
+    amount: number;
+    category: string;
+    description: string;
 }[]) {
-    await googleSheetsService.addBatchTransactions(transactions)
+    await csvService.addBatchTransactions(transactions)
     revalidatePath("/dashboard")
 }
 
 export async function deleteBatchTransactionsAction(ids: string[]) {
-    await googleSheetsService.deleteBatchTransactions(ids)
+    await csvService.deleteBatchTransactions(ids)
     revalidatePath("/dashboard")
+}
+
+export async function exportTransactionsAction() {
+    const transactions = await csvService.getTransactions()
+    if (transactions.length === 0) {
+        return { success: false, message: "No data available to export." }
+    }
+
+    // Group transactions by year
+    const grouped: Record<string, typeof transactions> = {}
+    for (const t of transactions) {
+        const year = t.date ? t.date.split("-")[0] : "Unknown"
+        if (!grouped[year]) {
+            grouped[year] = []
+        }
+        grouped[year].push(t)
+    }
+
+    const EXPORTS_DIR = path.join(process.cwd(), "exports")
+    if (!fs.existsSync(EXPORTS_DIR)) {
+        fs.mkdirSync(EXPORTS_DIR, { recursive: true })
+    }
+
+    const exportedFiles: string[] = []
+    for (const [year, list] of Object.entries(grouped)) {
+        // Sort chronologically ascending
+        const sortedList = [...list].sort((a, b) => a.date.localeCompare(b.date))
+        
+        // Map to exact column structure for standard CSV export
+        const exportData = sortedList.map(t => ({
+            id: t.id,
+            date: t.date,
+            type: t.type,
+            amount: t.amount,
+            category: t.category,
+            description: t.description || ""
+        }))
+
+        const csvContent = Papa.unparse(exportData)
+        const filePath = path.join(EXPORTS_DIR, `${year}.csv`)
+        fs.writeFileSync(filePath, csvContent, "utf-8")
+        exportedFiles.push(`exports/${year}.csv`)
+    }
+
+    return {
+        success: true,
+        message: `Saved CSV files partitioned by year into the exports/ directory.`,
+        files: exportedFiles
+    }
 }
