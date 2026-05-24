@@ -1,6 +1,13 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 
+const authSecret =
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  (process.env.NODE_ENV === "production"
+    ? undefined
+    : "local-bookkeeping-app-secure-jwt-secret-key-123")
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -21,7 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: "jwt",
   },
-  secret: process.env.AUTH_SECRET || "local-bookkeeping-app-secure-jwt-secret-key-123",
+  secret: authSecret,
   pages: {
     signIn: "/login",
   },

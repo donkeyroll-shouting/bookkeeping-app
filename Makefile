@@ -4,7 +4,7 @@
 IMAGE_NAME = bookkeeping-app
 CONTAINER_NAME = bookkeeping-app-container
 HOST_PORT = 3000
-CONTAINER_PORT = 3000
+CONTAINER_PORT = 10000
 ENV_FILE = .env.local
 ENV_ARGS = $(shell test -f $(ENV_FILE) && echo "--env-file $(ENV_FILE)")
 
@@ -21,8 +21,8 @@ run: ## Run the Docker container
 	docker run -d \
 		--name $(CONTAINER_NAME) \
 		-p $(HOST_PORT):$(CONTAINER_PORT) \
-		-e PORT=$(CONTAINER_PORT) \
 		$(ENV_ARGS) \
+		-e PORT=$(CONTAINER_PORT) \
 		$(IMAGE_NAME)
 	@echo "Container started at http://localhost:$(HOST_PORT)"
 
@@ -30,8 +30,8 @@ run-it: ## Run the Docker container in interactive mode
 	docker run -it --rm \
 		--name $(CONTAINER_NAME) \
 		-p $(HOST_PORT):$(CONTAINER_PORT) \
-		-e PORT=$(CONTAINER_PORT) \
 		$(ENV_ARGS) \
+		-e PORT=$(CONTAINER_PORT) \
 		$(IMAGE_NAME)
 
 stop: ## Stop the running container

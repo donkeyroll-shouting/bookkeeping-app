@@ -73,16 +73,30 @@ Password: admin
 
 ## Environment
 
-The app can run locally without an environment file because `auth.ts` has a development fallback secret. For anything beyond local development, set a real secret:
+The app can run locally without an environment file because `auth.ts` has a development fallback secret. For anything beyond local development, set a real secret.
+
+`AUTH_SECRET` is preferred:
 
 ```bash
 AUTH_SECRET="replace-with-a-long-random-secret"
 ```
 
-If you run behind a hosted URL, also set the public auth URL expected by your deployment environment.
+`NEXTAUTH_SECRET` is also supported for compatibility with existing NextAuth deployments:
+
+```bash
+NEXTAUTH_SECRET="replace-with-a-long-random-secret"
+```
+
+If you run behind a hosted URL, also set the public auth URL expected by your deployment environment:
 
 ```bash
 NEXTAUTH_URL="https://your-app.example.com"
+```
+
+For Render Docker web services, set the service port to `10000` or let Render inject it:
+
+```bash
+PORT=10000
 ```
 
 ## CSV Data
@@ -173,8 +187,8 @@ By default, those directories live inside the container filesystem. That means t
 ```bash
 docker run -d \
   --name bookkeeping-app-container \
-  -p 3000:3000 \
-  -e PORT=3000 \
+  -p 3000:10000 \
+  -e PORT=10000 \
   -e AUTH_SECRET="replace-with-a-long-random-secret" \
   -v "$(pwd)/data:/app/data" \
   -v "$(pwd)/exports:/app/exports" \
@@ -184,6 +198,6 @@ docker run -d \
 ## Production Notes
 
 - Replace the hardcoded demo credentials before using this with real financial data.
-- Set `AUTH_SECRET` to a strong secret.
+- Set `AUTH_SECRET` or `NEXTAUTH_SECRET` to a strong secret.
 - Mount persistent storage or replace the CSV store with an external database if data must survive deployments.
 - `npm install` currently reports security advisories for the installed dependency tree; review and upgrade dependencies before production use.
