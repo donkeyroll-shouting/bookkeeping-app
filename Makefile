@@ -1,9 +1,12 @@
-.PHONY: build run stop clean logs help
+.PHONY: build run run-it stop clean logs help rebuild restart shell smoke test
 
 # Variables
 IMAGE_NAME = bookkeeping-app
 CONTAINER_NAME = bookkeeping-app-container
-PORT = 3000
+HOST_PORT = 3000
+CONTAINER_PORT = 3000
+ENV_FILE = .env.local
+ENV_ARGS = $(shell test -f $(ENV_FILE) && echo "--env-file $(ENV_FILE)")
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -14,19 +17,21 @@ help: ## Show this help message
 build: ## Build the Docker image
 	docker build -t $(IMAGE_NAME) .
 
-run: ## Run the Docker container (requires .env.local file)
+run: ## Run the Docker container
 	docker run -d \
 		--name $(CONTAINER_NAME) \
-		-p $(PORT):$(PORT) \
-		--env-file .env.local \
+		-p $(HOST_PORT):$(CONTAINER_PORT) \
+		-e PORT=$(CONTAINER_PORT) \
+		$(ENV_ARGS) \
 		$(IMAGE_NAME)
-	@echo "Container started at http://localhost:$(PORT)"
+	@echo "Container started at http://localhost:$(HOST_PORT)"
 
 run-it: ## Run the Docker container in interactive mode
 	docker run -it --rm \
 		--name $(CONTAINER_NAME) \
-		-p $(PORT):$(PORT) \
-		--env-file .env.local \
+		-p $(HOST_PORT):$(CONTAINER_PORT) \
+		-e PORT=$(CONTAINER_PORT) \
+		$(ENV_ARGS) \
 		$(IMAGE_NAME)
 
 stop: ## Stop the running container
@@ -48,9 +53,15 @@ restart: stop run ## Restart the container
 shell: ## Open a shell in the running container
 	docker exec -it $(CONTAINER_NAME) /bin/sh
 
-test: build run ## Build and run the container
+smoke: ## Check the running container responds over HTTP
+	curl -fsS -I http://localhost:$(HOST_PORT)/
+	curl -fsS -I http://localhost:$(HOST_PORT)/login
+	curl -fsS -I http://localhost:$(HOST_PORT)/dashboard
+
+test: build restart ## Build, restart, and smoke-test the container
 	@echo "Waiting for container to start..."
 	@sleep 3
-	@echo "Container is running at http://localhost:$(PORT)"
+	$(MAKE) smoke
+	@echo "Container is running at http://localhost:$(HOST_PORT)"
 	@echo "Run 'make logs' to see the logs"
 	@echo "Run 'make stop' to stop the container"
