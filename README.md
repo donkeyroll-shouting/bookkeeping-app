@@ -73,24 +73,24 @@ Password: admin
 
 ## Environment
 
-The app can run locally without an environment file because `auth.ts` has a development fallback secret. For anything beyond local development, set a real secret.
+The app can run with `npm run dev` without an environment file because `auth.ts` has a development fallback secret. Docker runs the production build, so `make run` still needs a non-empty auth secret.
 
 `AUTH_SECRET` is preferred:
 
 ```bash
-AUTH_SECRET="replace-with-a-long-random-secret"
+AUTH_SECRET=replace-with-a-long-random-secret
 ```
 
 `NEXTAUTH_SECRET` is also supported for compatibility with existing NextAuth deployments:
 
 ```bash
-NEXTAUTH_SECRET="replace-with-a-long-random-secret"
+NEXTAUTH_SECRET=replace-with-a-long-random-secret
 ```
 
 If you run behind a hosted URL, also set the public auth URL expected by your deployment environment:
 
 ```bash
-NEXTAUTH_URL="https://your-app.example.com"
+NEXTAUTH_URL=https://your-app.example.com
 ```
 
 For Render Docker web services, set the service port to `10000` or let Render inject it:
@@ -102,11 +102,28 @@ PORT=10000
 Set the login credentials in Render:
 
 ```bash
-USERNAME="your-username"
-PASSWORD="your-password"
+USERNAME=your-username
+PASSWORD=your-password
 ```
 
 Local development falls back to `admin/admin` if those variables are not set. Production requires both values.
+
+When using `make run`, `.env.local` is passed to Docker with `--env-file`. Keep values unquoted in that file:
+
+```env
+AUTH_SECRET=local-development-only-secret-change-me
+NEXTAUTH_URL=http://localhost:3000
+USERNAME=admin
+PASSWORD=admin
+```
+
+Do not write `NEXTAUTH_URL="http://localhost:3000"` in `.env.local`; Docker includes those quote characters in the value.
+
+Do not leave `AUTH_SECRET` or `NEXTAUTH_SECRET` blank for Docker or Render. Generate a production secret with:
+
+```bash
+openssl rand -base64 32
+```
 
 ## CSV Data
 

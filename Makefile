@@ -1,4 +1,4 @@
-.PHONY: build run run-it stop clean logs help rebuild restart shell smoke test
+.PHONY: build run run-it stop clean logs help rebuild restart shell smoke test check-env
 
 # Variables
 IMAGE_NAME = bookkeeping-app
@@ -17,7 +17,14 @@ help: ## Show this help message
 build: ## Build the Docker image
 	docker build -t $(IMAGE_NAME) .
 
-run: ## Run the Docker container
+check-env: ## Validate Docker env settings
+	@if [ -f "$(ENV_FILE)" ] && ! grep -Eq '^(AUTH_SECRET|NEXTAUTH_SECRET)=[^[:space:]].+' "$(ENV_FILE)"; then \
+		echo "Missing auth secret in $(ENV_FILE). Set AUTH_SECRET or NEXTAUTH_SECRET to a non-empty unquoted value."; \
+		echo "Example: AUTH_SECRET=$$(openssl rand -base64 32)"; \
+		exit 1; \
+	fi
+
+run: check-env ## Run the Docker container
 	docker run -d \
 		--name $(CONTAINER_NAME) \
 		-p $(HOST_PORT):$(CONTAINER_PORT) \
@@ -26,7 +33,7 @@ run: ## Run the Docker container
 		$(IMAGE_NAME)
 	@echo "Container started at http://localhost:$(HOST_PORT)"
 
-run-it: ## Run the Docker container in interactive mode
+run-it: check-env ## Run the Docker container in interactive mode
 	docker run -it --rm \
 		--name $(CONTAINER_NAME) \
 		-p $(HOST_PORT):$(CONTAINER_PORT) \
